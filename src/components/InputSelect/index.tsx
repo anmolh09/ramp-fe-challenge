@@ -40,25 +40,7 @@ export function InputSelect<TItem>({
 
   useEffect(() => {
     const handleScroll = (event) => {
-      // console.log('ref',dropdownRef.current)
-      // const pos = getDropdownPosition(dropdownRef.current)
-
-      //     let pos ;
-
-      //   if (dropdownRef.current instanceof Element) {
-      //   const { top, left } = dropdownRef.current.getBoundingClientRect()
-      //   // console.log(dropdownRef.current.getBoundingClientRect())
-      //   // console.log('pos ',pos, ' scrolly', window.scrollY)
-      //   const { scrollY } = window
-      //   pos = {
-      //     top: top  + 60 ,
-      //     left,
-      //   }
-      // }
-      // else pos =  { top: 0, left: 0 };
-
       setDropdownPosition(getDropdownPosition(dropdownRef.current));
-      // toggleProps.onClick(event)
     };
 
     window.addEventListener("scroll", handleScroll);

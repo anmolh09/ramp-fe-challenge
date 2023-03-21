@@ -26,29 +26,29 @@ export const TransactionPane: TransactionPaneComponent = ({
       >
         <label
           className={classNames("RampInputCheckbox--label", {
-            "RampInputCheckbox--label-checked": transaction.approved,
-            "RampInputCheckbox--label-disabled": !transaction.approved
+            "RampInputCheckbox--label-checked": approved,
+            "RampInputCheckbox--label-disabled": !approved
           })}
         >
           <input
             id={transaction.id}
             type="checkbox"
             className="RampInputCheckbox--input"
-            checked={transaction.approved}
+            checked={approved}
             disabled={loading}
             // onClick={() => {
             //   console.log('checked')
 
             // }}
             onChange={async (e) => {
-              console.log("approved", e);
-
+              // console.log("approved", e);
+              setApproved(!approved);
               await consumerSetTransactionApproval({
                 transactionId: transaction.id,
-                newValue: !transaction.approved
+                newValue: !approved
               });
 
-              setApproved(transaction.approved);
+              
             }}
           />
         </label>
