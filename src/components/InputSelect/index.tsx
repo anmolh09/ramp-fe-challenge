@@ -1,7 +1,12 @@
-import Downshift from "downshift"
-import { useCallback, useState } from "react"
-import classNames from "classnames"
-import { DropdownPosition, GetDropdownPositionFn, InputSelectOnChange, InputSelectProps } from "./types"
+import Downshift from "downshift";
+import { useCallback, useState, useEffect, useRef } from "react";
+import classNames from "classnames";
+import {
+  DropdownPosition,
+  GetDropdownPositionFn,
+  InputSelectOnChange,
+  InputSelectProps
+} from "./types";
 
 export function InputSelect<TItem>({
   label,
@@ -10,25 +15,58 @@ export function InputSelect<TItem>({
   items,
   parseItem,
   isLoading,
-  loadingLabel,
+  loadingLabel
 }: InputSelectProps<TItem>) {
-  const [selectedValue, setSelectedValue] = useState<TItem | null>(defaultValue ?? null)
+  const [selectedValue, setSelectedValue] = useState<TItem | null>(
+    defaultValue ?? null
+  );
   const [dropdownPosition, setDropdownPosition] = useState<DropdownPosition>({
     top: 0,
-    left: 0,
-  })
+    left: 0
+  });
+  const dropdownRef = useRef(null);
 
   const onChange = useCallback<InputSelectOnChange<TItem>>(
     (selectedItem) => {
       if (selectedItem === null) {
-        return
+        return;
       }
 
-      consumerOnChange(selectedItem)
-      setSelectedValue(selectedItem)
+      consumerOnChange(selectedItem);
+      setSelectedValue(selectedItem);
     },
     [consumerOnChange]
-  )
+  );
+
+  useEffect(() => {
+    const handleScroll = (event) => {
+      // console.log('ref',dropdownRef.current)
+      // const pos = getDropdownPosition(dropdownRef.current)
+
+      //     let pos ;
+
+      //   if (dropdownRef.current instanceof Element) {
+      //   const { top, left } = dropdownRef.current.getBoundingClientRect()
+      //   // console.log(dropdownRef.current.getBoundingClientRect())
+      //   // console.log('pos ',pos, ' scrolly', window.scrollY)
+      //   const { scrollY } = window
+      //   pos = {
+      //     top: top  + 60 ,
+      //     left,
+      //   }
+      // }
+      // else pos =  { top: 0, left: 0 };
+
+      setDropdownPosition(getDropdownPosition(dropdownRef.current));
+      // toggleProps.onClick(event)
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   return (
     <Downshift<TItem>
@@ -45,22 +83,28 @@ export function InputSelect<TItem>({
         highlightedIndex,
         selectedItem,
         getToggleButtonProps,
-        inputValue,
+        inputValue
       }) => {
-        const toggleProps = getToggleButtonProps()
-        const parsedSelectedItem = selectedItem === null ? null : parseItem(selectedItem)
+        const toggleProps = getToggleButtonProps();
+        const parsedSelectedItem =
+          selectedItem === null ? null : parseItem(selectedItem);
 
         return (
           <div className="RampInputSelect--root">
-            <label className="RampText--s RampText--hushed" {...getLabelProps()}>
+            <label
+              className="RampText--s RampText--hushed"
+              {...getLabelProps()}
+            >
               {label}
             </label>
             <div className="RampBreak--xs" />
             <div
               className="RampInputSelect--input"
+              ref={dropdownRef}
               onClick={(event) => {
-                setDropdownPosition(getDropdownPosition(event.target))
-                toggleProps.onClick(event)
+                console.log(event.target);
+                setDropdownPosition(getDropdownPosition(event.target));
+                toggleProps.onClick(event);
               }}
             >
               {inputValue}
@@ -68,7 +112,7 @@ export function InputSelect<TItem>({
 
             <div
               className={classNames("RampInputSelect--dropdown-container", {
-                "RampInputSelect--dropdown-container-opened": isOpen,
+                "RampInputSelect--dropdown-container-opened": isOpen
               })}
               {...getMenuProps()}
               style={{ top: dropdownPosition.top, left: dropdownPosition.left }}
@@ -76,23 +120,29 @@ export function InputSelect<TItem>({
               {renderItems()}
             </div>
           </div>
-        )
+        );
 
         function renderItems() {
           if (!isOpen) {
-            return null
+            return null;
           }
 
           if (isLoading) {
-            return <div className="RampInputSelect--dropdown-item">{loadingLabel}...</div>
+            return (
+              <div className="RampInputSelect--dropdown-item">
+                {loadingLabel}...
+              </div>
+            );
           }
 
           if (items.length === 0) {
-            return <div className="RampInputSelect--dropdown-item">No items</div>
+            return (
+              <div className="RampInputSelect--dropdown-item">No items</div>
+            );
           }
 
           return items.map((item, index) => {
-            const parsedItem = parseItem(item)
+            const parsedItem = parseItem(item);
             return (
               <div
                 key={parsedItem.value}
@@ -101,31 +151,33 @@ export function InputSelect<TItem>({
                   index,
                   item,
                   className: classNames("RampInputSelect--dropdown-item", {
-                    "RampInputSelect--dropdown-item-highlighted": highlightedIndex === index,
+                    "RampInputSelect--dropdown-item-highlighted":
+                      highlightedIndex === index,
                     "RampInputSelect--dropdown-item-selected":
-                      parsedSelectedItem?.value === parsedItem.value,
-                  }),
+                      parsedSelectedItem?.value === parsedItem.value
+                  })
                 })}
               >
                 {parsedItem.label}
               </div>
-            )
-          })
+            );
+          });
         }
       }}
     </Downshift>
-  )
+  );
 }
 
 const getDropdownPosition: GetDropdownPositionFn = (target) => {
   if (target instanceof Element) {
-    const { top, left } = target.getBoundingClientRect()
-    const { scrollY } = window
+    const { top, left } = target.getBoundingClientRect();
+    // console.log(target.getBoundingClientRect())
+    const { scrollY } = window;
     return {
-      top: scrollY + top + 63,
-      left,
-    }
+      top: top + 63,
+      left
+    };
   }
 
-  return { top: 0, left: 0 }
-}
+  return { top: 0, left: 0 };
+};
