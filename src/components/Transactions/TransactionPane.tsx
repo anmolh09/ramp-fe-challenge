@@ -36,10 +36,6 @@ export const TransactionPane: TransactionPaneComponent = ({
             className="RampInputCheckbox--input"
             checked={approved}
             disabled={loading}
-            // onClick={() => {
-            //   console.log('checked')
-
-            // }}
             onChange={async (e) => {
               // console.log("approved", e);
               setApproved(!approved);
@@ -47,8 +43,6 @@ export const TransactionPane: TransactionPaneComponent = ({
                 transactionId: transaction.id,
                 newValue: !approved
               });
-
-              
             }}
           />
         </label>
